@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supertrend Finder - European Stock Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e293b 100%);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #60a5fa, #c084fc, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #d1d5db;
+            max-width: 600px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #10b981, #2563eb);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section h2 {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+        
+        .stocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .stock-card {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #34d399;
+            transition: transform 0.3s ease;
+        }
+        
+        .stock-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(52, 211, 153, 0.3);
+        }
+        
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stock-symbol {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stock-name {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+        
+        .stock-price {
+            font-size: 1.3rem;
+            color: #34d399;
+        }
+        
+        .stock-change {
+            color: #34d399;
+            font-size: 1.1rem;
+        }
+        
+        .stock-alert {
+            background: rgba(52, 211, 153, 0.2);
+            border: 1px solid rgba(52, 211, 153, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            color: #6ee7b7;
+            font-weight: 500;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .email-signup {
+            background: rgba(30, 58, 138, 0.8);
+            padding: 60px 20px;
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .signup-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #10b981, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .section h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div>
+            <h1>🚀 Supertrend Finder</h1>
+            <p>Discover trending European stocks before they explode. Track social media hype, unusual volume, and price spikes.</p>
+            <a href="#stocks" class="btn">📈 See Live Rankings</a>
+            <a href="#signup" class="btn">📬 Get Alerts</a>
+        </div>
+    </section>
+
+    <!-- Top Trending Stocks -->
+    <section id="stocks" class="section">
+        <h2>📈 Top 10 Trending Stocks</h2>
+        <div class="stocks-grid">
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div>
+                        <div class="stock-symbol">1. ASML</div>
+                        <div class="stock-name">ASML Holding</div>
+                    </div>
+                    <div>
+                        <div class="stock-price">€742.80</div>
+                        <div class="stock-change">+12.4%</div>
+                    </div>
+                </div>
+                <div class="stock-alert">🚀 This stock is about to go big!</div>
+            </div>
+
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div>
+                        <div class="stock-symbol">2. SAP</div>
+                        <div class="stock-name">SAP SE</div>
+                    </div>
+                    <div>
+                        <div class="stock-price">€134.52</div>
+                        <div class="stock-change">+8.7%</div>
+                    </div>
+                </div>
+                <div class="stock-alert">🔥 Massive breakout incoming!</div>
+            </div>
+
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div>
+                        <div class="stock-symbol">3. LVMH</div>
+                        <div class="stock-name">LVMH</div>
+                    </div>
+                    <div>
+                        <div class="stock-price">€798.20</div>
+                        <div class="stock-change">+15.2%</div>
+                    </div>
+                </div>
+                <div class="stock-alert">💎 Premium trend spotted!</div>
+            </div>
+
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div>
+                        <div class="stock-symbol">4. NESN</div>
+                        <div class="stock-name">Nestlé</div>
+                    </div>
+                    <div>
+                        <div class="stock-price">CHF 92.48</div>
+                        <div class="stock-change">+6.3%</div>
+                    </div>
+                </div>
+                <div class="stock-alert">⚡ Volume spike detected!</div>
+            </div>
+
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div>
+                        <div class="stock-symbol">5. NOV</div>
+                        <div class="stock-name">Novartis</div>
+                    </div>
+                    <div>
+                        <div class="stock-price">CHF 97.12</div>
+                        <div class="stock-change">+4.9%</div>
+                    </div>
+                </div>
+                <div class="stock-alert">📈 Momentum building!</div>
+            </div>
+
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div>
+                        <div class="stock-symbol">6. UNA</div>
+                        <div class="stock-name">Unilever</div>
+                    </div>
+                    <div>
+                        <div class="stock-price">€48.76</div>
+                        <div class="stock-change">+7.1%</div>
+                    </div>
+                </div>
+                <div class="stock-alert">🎯 Perfect entry point!</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How We Spot Stocks -->
+    <section class="section" style="background: rgba(30, 41, 59, 0.3);">
+        <h2>🧠 How We Spot Breakout Stocks</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Social Media Hype</h3>
+                <p>Monitor Twitter, Reddit, and financial forums for unusual mention spikes and sentiment shifts.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Unusual Volume</h3>
+                <p>Detect volume anomalies that often precede major price movements before the crowd notices.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Price Spikes</h3>
+                <p>Advanced pattern recognition identifies breakout formations and momentum shifts.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- European Markets -->
+    <section class="section">
+        <h2>🌍 Focused on European Markets</h2>
+        <div style="max-width: 600px; margin: 0 auto; background: rgba(30, 41, 59, 0.8); padding: 30px; border-radius: 15px;">
+            <h4 style="font-size: 1.5rem; margin-bottom: 20px; text-align: center;">Market Coverage</h4>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>🇩🇪 German DAX</span>
+                <span style="color: #34d399;">40 stocks tracked</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>🇫🇷 French CAC 40</span>
+                <span style="color: #34d399;">40 stocks tracked</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>🇬🇧 UK FTSE 100</span>
+                <span style="color: #34d399;">100 stocks tracked</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>🇳🇱 Dutch AEX</span>
+                <span style="color: #34d399;">25 stocks tracked</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 20px; padding-top: 15px; border-top: 1px solid #475569;">
+                <span>Total Coverage</span>
+                <span style="color: #34d399; font-size: 1.2rem;">240+ stocks</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Email Signup -->
+    <section id="signup" class="email-signup">
+        <h2>📬 Get Hot Stock Alerts</h2>
+        <p style="font-size: 1.2rem; margin-bottom: 30px;">Be the first to know when we spot the next European breakout stock. Join 25,000+ smart investors.</p>
+        <div class="signup-form">
+            <form onsubmit="handleSubmit(event)">
+                <input type="email" class="form-input" placeholder="Enter your email address" required>
+                <button type="submit" class="submit-btn">Get Free Alerts →</button>
+                <p style="font-size: 0.9rem; color: #9ca3af; margin-top: 15px;">No spam. Unsubscribe anytime. We respect your privacy.</p>
+            </form>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section class="section" style="background: rgba(30, 41, 59, 0.3);">
+        <h2>📚 Latest Market Insights</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Why ASML is Europe's Hidden Tech Giant</h3>
+                <p>Deep dive into the semiconductor equipment maker that's quietly dominating global markets...</p>
+                <small style="color: #9ca3af;">June 15, 2025</small>
+            </div>
+            <div class="feature-card">
+                <h3>The European Green Energy Stock Revolution</h3>
+                <p>How renewable energy companies are reshaping the investment landscape across Europe...</p>
+                <small style="color: #9ca3af;">June 12, 2025</small>
+            </div>
+            <div class="feature-card">
+                <h3>Luxury Stocks: The New Safe Haven?</h3>
+                <p>Why European luxury brands might be your best hedge against market volatility...</p>
+                <small style="color: #9ca3af;">June 10, 2025</small>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const email = form.querySelector('input[type="email"]').value;
+            alert('🎉 Welcome aboard! You\'re now subscribed to hot stock alerts for: ' + email);
+            form.reset();
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
